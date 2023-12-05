@@ -3,13 +3,14 @@ use std::{
     io::{
         BufReader,
         prelude::*,
+        stdin,
+        stdout,
     },
     net::{
         TcpListener,
         TcpStream,
     },
 };
-use std::io::{stdin, stdout};
 use anyhow::Result;
 use rayon::{ThreadPool, ThreadPoolBuilder};
 
@@ -19,8 +20,11 @@ fn main() -> Result<()> {
     stdout().flush()?;
     let mut ip: String = String::new();
     stdin().read_line(&mut ip)?;
+
     let listener: TcpListener = TcpListener::bind(ip.trim())?;
+
     let pool: ThreadPool = ThreadPoolBuilder::new().num_threads(4).build()?;
+
     for stream in listener.incoming() {
         let stream: TcpStream = stream?;
 
@@ -49,5 +53,5 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
     let response: String = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
 
     stream.write_all(response.as_bytes())?;
-    return Ok(())
+    return Ok(());
 }
