@@ -12,7 +12,10 @@ use std::{
     },
 };
 use anyhow::Result;
-use rayon::{ThreadPool, ThreadPoolBuilder};
+use rayon::{
+    ThreadPool,
+    ThreadPoolBuilder
+};
 
 
 fn main() -> Result<()> {
@@ -30,7 +33,7 @@ fn main() -> Result<()> {
 
         pool.spawn(|| {
             handle_connection(stream).unwrap();
-        })
+        });
     }
 
     return Ok(());
@@ -41,10 +44,9 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
     let buf_reader: BufReader<&mut TcpStream> = BufReader::new(&mut stream);
     let request_line: String = buf_reader.lines().next().unwrap()?;
 
-    let (status_line, filename): (&str, &str) = if request_line == "GET / HTTP/1.1" {
-        ("HTTP/1.1 200 OK", "html/index.html")
-    } else {
-        ("HTTP/1.1 404 NOT FOUND", "html/404.html")
+    let (status_line, filename): (&str, &str) = match request_line.as_str() {
+        "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "html/index.html"),
+        _ => ("HTTP/1.1 404 NOT FOUND", "html/404.html"),
     };
 
     let contents: String = fs::read_to_string(filename)?;

@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 rayon = "1.8.0"
 anyhow = "1.0.75"
-futures = { version = "0.3.29", features = ["thread-pool"] }
